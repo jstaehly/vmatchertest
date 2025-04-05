@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Venue Matcher</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 800px; margin: auto; }
+    input, select, button { margin: 5px 0; padding: 8px; width: 100%; }
+    .venue { border: 1px solid #ccc; padding: 15px; margin: 10px 0; border-radius: 8px; }
+    .venue h3 { margin: 0 0 5px 0; }
+  </style>
+</head>
+<body>
+  <h1>Find Your Perfect Venue</h1>
+
+  <label>Preferred City: <input id="city" /></label>
+  <label>Guest Count: <input id="guestCount" type="number" /></label>
+  <label>Preferred Atmosphere:
+    <select id="vibe">
+      <option value="">--</option>
+      <option value="Rustic">Rustic</option>
+      <option value="Elegant">Elegant</option>
+      <option value="Modern">Modern</option>
+    </select>
+  </label>
+  <label>Min Budget: <input id="budgetMin" type="number" /></label>
+  <label>Max Budget: <input id="budgetMax" type="number" /></label>
+  <label>Need Lodging?
+    <select id="lodging">
+      <option value="">--</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </label>
+  <label>Need A/V?
+    <select id="av">
+      <option value="">--</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </label>
+  <label>Need All-Inclusive?
+    <select id="allInclusive">
+      <option value="">--</option>
+      <option value="Yes">Yes</option>
+      <option value="No">No</option>
+    </select>
+  </label>
+
+  <button onclick="matchVenues()">Find Venues</button>
+
+  <div id="results"></div>
+
+  <script>
+    const venues = [
+      {
+        name: "Revolution Mill",
+        city: "Greensboro",
+        seatedCapacity: 250,
+        vibe: "Rustic",
+        hasLodging: false,
+        hasAV: true,
+        allInclusive: true,
+        minPrice: 5000,
+        maxPrice: 10000
+      },
+      {
+        name: "Castle McCulloch",
+        city: "Jamestown",
+        seatedCapacity: 150,
+        vibe: "Elegant",
+        hasLodging: true,
+        hasAV: true,
+        allInclusive: false,
+        minPrice: 4000,
+        maxPrice: 8000
+      }
+    ];
+
+    function matchVenues() {
+      const city = document.getElementById('city').value;
+      const guestCount = parseInt(document.getElementById('guestCount').value);
+      const vibe = document.getElementById('vibe').value;
+      const budgetMin = parseInt(document.getElementById('budgetMin').value);
+      const budgetMax = parseInt(document.getElementById('budgetMax').value);
+      const lodging = document.getElementById('lodging').value;
+      const av = document.getElementById('av').value;
+      const allInclusive = document.getElementById('allInclusive').value;
+
+      const matched = venues.filter(v => {
+        return (!city || city === v.city) &&
+          (!guestCount || guestCount <= v.seatedCapacity) &&
+          (!vibe || vibe === v.vibe) &&
+          (!budgetMin || v.minPrice >= budgetMin) &&
+          (!budgetMax || v.maxPrice <= budgetMax) &&
+          (!lodging || (lodging === 'Yes' && v.hasLodging)) &&
+          (!av || (av === 'Yes' && v.hasAV)) &&
+          (!allInclusive || (allInclusive === 'Yes' && v.allInclusive));
+      });
+
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = '';
+      matched.forEach(v => {
+        resultsDiv.innerHTML += `<div class="venue">
+          <h3>${v.name}</h3>
+          <p>${v.city} — ${v.vibe}</p>
+          <p>Seats: ${v.seatedCapacity}</p>
+          <p>Budget: $${v.minPrice}–$${v.maxPrice}</p>
+          <p>Lodging: ${v.hasLodging ? 'Yes' : 'No'}, A/V: ${v.hasAV ? 'Yes' : 'No'}, All-Inclusive: ${v.allInclusive ? 'Yes' : 'No'}</p>
+        </div>`;
+      });
+
+      if (matched.length === 0) {
+        resultsDiv.innerHTML = '<p>No matching venues found.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
